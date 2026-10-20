@@ -81,7 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
       await _mqtt.connect(_settings);
     } catch (e) {
       if (mounted) {
-        setState(() => _error = 'اتصال برقرار نشد. تنظیمات را بررسی کنید.');
+        // Show the underlying MQTT exception during diagnosis instead of
+        // hiding all broker/network/rejection errors behind one generic text.
+        setState(() => _error = 'اتصال برقرار نشد. جزئیات خطا: ${e.toString()}');
       }
     }
   }
