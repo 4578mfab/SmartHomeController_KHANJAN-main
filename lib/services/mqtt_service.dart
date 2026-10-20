@@ -46,7 +46,11 @@ class MqttService {
     // alone must not silently switch a TCP connection to WebSocket.
 
     _client = MqttServerClient.withPort(broker, clientId, port);
-    _client!.logging(on: false);
+    _client!.logging(on: true);
+    // Explicitly use MQTT 3.1.1 rather than relying on the package default.
+    _client!.setProtocolV311();
+    // Allow enough time for the broker's CONNACK on slower mobile networks.
+    _client!.connectTimeoutPeriod = 10000;
     _client!.keepAlivePeriod = 60;
     _client!.autoReconnect = true;
     // Re-subscribe in onAutoReconnected below so the behaviour is explicit
@@ -94,6 +98,8 @@ class MqttService {
     try {
       await _client!.connect();
     } catch (e) {
+      final status = _client?.connectionStatus;
+      final detailedError = '$e | MQTT state: ${status?.state}, broker return code: ${status?.returnCode}';
       _connectionController.add(false);
       _espStatusController.add(false);
       await _updatesSubscription?.cancel();
@@ -102,7 +108,7 @@ class MqttService {
         _client?.disconnect();
       } catch (_) {}
       _client = null;
-      rethrow;
+      throw Exception(detailedError);
     }
 
     if (_client?.connectionStatus?.state == MqttConnectionState.connected) {
@@ -110,6 +116,7 @@ class MqttService {
       // onConnected performs the initial subscription. Do not subscribe a
       // second time here.
     } else {
+      final status = _client?.connectionStatus;
       _connectionController.add(false);
       _espStatusController.add(false);
       await _updatesSubscription?.cancel();
@@ -118,7 +125,7 @@ class MqttService {
         _client?.disconnect();
       } catch (_) {}
       _client = null;
-      throw Exception('MQTT connection failed');
+      throw Exception('MQTT connection failed | state: ${status?.state}, broker return code: ${status?.returnCode}');
     }
   }
 
