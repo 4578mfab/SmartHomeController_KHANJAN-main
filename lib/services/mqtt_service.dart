@@ -26,9 +26,18 @@ class MqttService {
     await disconnect();
     _settings = settings;
 
-    final clientId = settings.clientId.trim().isEmpty
-        ? 'khanjan_${DateTime.now().millisecondsSinceEpoch}'
-        : settings.clientId.trim();
+    // Public MQTT brokers require client IDs to be unique across all users.
+    // Keep the configured value as a readable prefix, but add a short unique
+    // suffix so another installation using the same default cannot kick us off.
+    final configuredId = settings.clientId.trim().isEmpty
+        ? 'khanjan'
+        : settings.clientId.trim().replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
+    final uniqueSuffix = DateTime.now().millisecondsSinceEpoch.toRadixString(36);
+    final maxPrefixLength = 22 - uniqueSuffix.length;
+    final prefix = configuredId.length > maxPrefixLength
+        ? configuredId.substring(0, maxPrefixLength)
+        : configuredId;
+    final clientId = '${prefix}_$uniqueSuffix';
 
     final broker = settings.broker.trim();
     final port = settings.port == 0 ? 1883 : settings.port;
