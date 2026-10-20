@@ -80,8 +80,7 @@ class MqttService {
 
     final connMess = MqttConnectMessage()
         .withClientIdentifier(clientId)
-        .startClean()
-        .withWillQos(MqttQos.atLeastOnce);
+        .startClean();
 
     if (settings.username.trim().isNotEmpty) {
       connMess.authenticateAs(
