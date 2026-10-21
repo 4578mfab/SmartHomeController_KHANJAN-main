@@ -50,13 +50,11 @@ class MqttService {
       _client!.websocketProtocols = ['mqtt'];
     }
 
-    // Start listening before connecting/subscribing so retained MQTT messages
-    // (status and temperature) cannot arrive before the listener is attached.
-    _updatesSubscription = _client!.updates?.listen(_onMessage);
-
+    // Do not subscribe from onConnected: connect() may still be completing.
+    // The update listener is attached immediately after connect() succeeds,
+    // then subscriptions are issued so retained messages are received.
     _client!.onConnected = () {
       _connectionController.add(true);
-      _subscribeAll();
     };
 
     _client!.onDisconnected = () {
@@ -94,6 +92,15 @@ class MqttService {
     }
 
     if (_client?.connectionStatus?.state == MqttConnectionState.connected) {
+      // Attach the listener only after the client has initialized its updates
+      // stream, but before subscribing to any topic.
+      await _updatesSubscription?.cancel();
+      _updatesSubscription = _client!.updates?.listen(
+        _onMessage,
+        onError: (Object error, StackTrace stack) {
+          // Keep the MQTT connection alive; diagnostics are handled by UI.
+        },
+      );
       _connectionController.add(true);
       _subscribeAll();
     } else {
