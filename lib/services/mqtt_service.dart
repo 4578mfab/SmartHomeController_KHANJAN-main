@@ -156,10 +156,17 @@ class MqttService {
       if (_settings == null) continue;
 
       if (topic == _settings!.espStatusTopic) {
-        final online = payload.toLowerCase() == 'online' ||
-            payload.toLowerCase() == 'on' ||
-            payload == '1' ||
-            payload.toLowerCase() == 'true';
+        // SmartControl V1.09 publishes a retained multi-line status such as:
+        // "ESP32 : Online\nLED : ON\nRelay : OFF"
+        // The last-will message is "ESP32 Offline".
+        final normalized = payload.toLowerCase();
+        final online = normalized == 'online' ||
+            normalized == 'on' ||
+            normalized == '1' ||
+            normalized == 'true' ||
+            (normalized.contains('esp32') &&
+                normalized.contains('online') &&
+                !normalized.contains('offline'));
         _espStatusController.add(online);
         continue;
       }
