@@ -6,8 +6,8 @@ import '../models/relay_config.dart';
 
 class MqttService {
   MqttServerClient? _client;
-  AppSettings? _settings;
   StreamSubscription<List<MqttReceivedMessage<MqttMessage>>>? _updatesSubscription;
+  AppSettings? _settings;
 
   final _connectionController = StreamController<bool>.broadcast();
   final _temperatureController = StreamController<String>.broadcast();
@@ -26,42 +26,33 @@ class MqttService {
     await disconnect();
     _settings = settings;
 
-    // Public MQTT brokers require client IDs to be unique across all users.
-    // Keep the configured value as a readable prefix, but add a short unique
-    // suffix so another installation using the same default cannot kick us off.
-    final configuredId = settings.clientId.trim().isEmpty
-        ? 'khanjan'
-        : settings.clientId.trim().replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
-    final uniqueSuffix = DateTime.now().millisecondsSinceEpoch.toRadixString(36);
-    final maxPrefixLength = 22 - uniqueSuffix.length;
-    final prefix = configuredId.length > maxPrefixLength
-        ? configuredId.substring(0, maxPrefixLength)
-        : configuredId;
-    final clientId = '${prefix}_$uniqueSuffix';
+    final clientId = settings.clientId.trim().isEmpty
+        ? 'khanjan_${DateTime.now().millisecondsSinceEpoch}'
+        : settings.clientId.trim();
 
     final broker = settings.broker.trim();
     final port = settings.port == 0 ? 1883 : settings.port;
 
-    // Respect the user's explicit connection-method setting. A port number
-    // alone must not silently switch a TCP connection to WebSocket.
+    final useWs = settings.useWebSocket ||
+        port == 8000 ||
+        port == 8083 ||
+        port == 8884;
 
     _client = MqttServerClient.withPort(broker, clientId, port);
-    _client!.logging(on: true);
-    // Explicitly use MQTT 3.1.1 rather than relying on the package default.
-    _client!.setProtocolV311();
-    // Allow enough time for the broker's CONNACK on slower mobile networks.
-    _client!.connectTimeoutPeriod = 10000;
+    _client!.logging(on: false);
     _client!.keepAlivePeriod = 60;
     _client!.autoReconnect = true;
-    // Re-subscribe in onAutoReconnected below so the behaviour is explicit
-    // and does not depend on the client's automatic subscription cache.
-    _client!.resubscribeOnAutoReconnect = false;
+    _client!.resubscribeOnAutoReconnect = true;
     _client!.secure = false;
 
-    if (settings.useWebSocket) {
+    if (useWs) {
       _client!.useWebSocket = true;
       _client!.websocketProtocols = ['mqtt'];
     }
+
+    // Start listening before connecting/subscribing so retained MQTT messages
+    // (status and temperature) cannot arrive before the listener is attached.
+    _updatesSubscription = _client!.updates?.listen(_onMessage);
 
     _client!.onConnected = () {
       _connectionController.add(true);
@@ -90,41 +81,25 @@ class MqttService {
     }
     _client!.connectionMessage = connMess;
 
-    // Start listening BEFORE connect/subscribe so retained messages (for
-    // example ESP32 online and relay states) are not missed on first connect.
-    _updatesSubscription = _client!.updates?.listen(_onMessage);
-
     try {
       await _client!.connect();
     } catch (e) {
-      final status = _client?.connectionStatus;
-      final detailedError = '$e | MQTT state: ${status?.state}, broker return code: ${status?.returnCode}';
       _connectionController.add(false);
       _espStatusController.add(false);
-      await _updatesSubscription?.cancel();
-      _updatesSubscription = null;
       try {
         _client?.disconnect();
       } catch (_) {}
       _client = null;
-      throw Exception(detailedError);
+      rethrow;
     }
 
     if (_client?.connectionStatus?.state == MqttConnectionState.connected) {
       _connectionController.add(true);
-      // onConnected performs the initial subscription. Do not subscribe a
-      // second time here.
+      _subscribeAll();
     } else {
-      final status = _client?.connectionStatus;
       _connectionController.add(false);
       _espStatusController.add(false);
-      await _updatesSubscription?.cancel();
-      _updatesSubscription = null;
-      try {
-        _client?.disconnect();
-      } catch (_) {}
-      _client = null;
-      throw Exception('MQTT connection failed | state: ${status?.state}, broker return code: ${status?.returnCode}');
+      throw Exception('MQTT connection failed');
     }
   }
 
@@ -156,17 +131,22 @@ class MqttService {
       if (_settings == null) continue;
 
       if (topic == _settings!.espStatusTopic) {
-        // SmartControl V1.09 publishes a retained multi-line status such as:
-        // "ESP32 : Online\nLED : ON\nRelay : OFF"
-        // The last-will message is "ESP32 Offline".
+        // Firmware may publish a multiline status such as:
+        // 'ESP32 : Online\nLED : OFF\nRelay : OFF'.
+        // Check Offline first because the status text can contain other words.
         final normalized = payload.toLowerCase();
-        final online = normalized == 'online' ||
+        final bool online;
+        if (normalized.contains('offline')) {
+          online = false;
+        } else if (normalized.contains('online') ||
             normalized == 'on' ||
             normalized == '1' ||
-            normalized == 'true' ||
-            (normalized.contains('esp32') &&
-                normalized.contains('online') &&
-                !normalized.contains('offline'));
+            normalized == 'true') {
+          online = true;
+        } else {
+          // Unknown status payload: do not falsely mark the ESP32 online.
+          online = false;
+        }
         _espStatusController.add(online);
         continue;
       }
@@ -201,7 +181,9 @@ class MqttService {
   }
 
   Future<void> disconnect() async {
-    await _updatesSubscription?.cancel();
+    try {
+      await _updatesSubscription?.cancel();
+    } catch (_) {}
     _updatesSubscription = null;
     try {
       _client?.disconnect();
