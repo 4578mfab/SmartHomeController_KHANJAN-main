@@ -50,7 +50,7 @@ class _KhanjanAppState extends State<KhanjanApp> {
       );
     }
 
-    final themeData = AppThemes.themes[_settings.themeIndex.clamp(0, 2)];
+    final themeData = AppThemes.themes[_settings.themeIndex.clamp(0, AppThemes.themes.length - 1)];
     final materialTheme = AppThemes.buildTheme(themeData);
 
     return MaterialApp(
