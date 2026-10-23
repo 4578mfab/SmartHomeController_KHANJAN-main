@@ -124,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppThemes.themes[_settings.themeIndex.clamp(0, 2)];
+    final theme = AppThemes.themes[_settings.themeIndex.clamp(0, AppThemes.themes.length - 1)];
     final materialTheme = AppThemes.buildTheme(theme);
 
     if (_loading) {
@@ -139,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         backgroundColor: theme.background,
         appBar: AppBar(
-          title: const Text('KHANJAN IoT Home'),
+          title: const Text('KHANJAN'),
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 2),
@@ -281,31 +281,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              Text(
-                'تم رنگی',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: theme.text,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                children: List.generate(AppThemes.themes.length, (i) {
-                  final t = AppThemes.themes[i];
-                  final selected = i == _settings.themeIndex;
-                  return ChoiceChip(
-                    label: Text(t.name),
-                    selected: selected,
-                    selectedColor: t.primary.withOpacity(0.2),
-                    onSelected: (_) async {
-                      setState(() => _settings.themeIndex = i);
-                      await _settingsService.save(_settings);
-                    },
-                  );
-                }),
-              ),
             ],
           ),
         ),
