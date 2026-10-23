@@ -154,7 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppThemes.themes[_settings.themeIndex.clamp(0, 2)];
+    final theme = AppThemes.themes[_settings.themeIndex.clamp(0, AppThemes.themes.length - 1)];
     final materialTheme = AppThemes.buildTheme(theme);
 
     return Theme(
@@ -181,6 +181,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              _sectionTitle('رنگ‌بندی برنامه', theme),
+              _card(theme, [
+                Text('برای تغییر رنگ پس‌زمینه و دکمه‌ها یکی از رنگ‌ها را انتخاب کن.', style: TextStyle(color: theme.text.withOpacity(0.72), fontSize: 13)),
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 14,
+                  runSpacing: 12,
+                  children: List.generate(AppThemes.themes.length, (i) {
+                    final option = AppThemes.themes[i];
+                    final selected = i == _settings.themeIndex;
+                    return InkWell(
+                      onTap: () => setState(() => _settings.themeIndex = i),
+                      customBorder: const CircleBorder(),
+                      child: Tooltip(
+                        message: option.subtitle,
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: option.primary,
+                            border: Border.all(color: selected ? theme.text : theme.card, width: selected ? 3 : 1),
+                            boxShadow: [BoxShadow(color: option.primary.withOpacity(0.22), blurRadius: 5, offset: const Offset(0, 2))],
+                          ),
+                          child: selected ? const Icon(Icons.check, color: Colors.white, size: 19) : null,
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ]),
+              const SizedBox(height: 20),
               _sectionTitle('اتصال MQTT', theme),
               _card(theme, [
                 TextFormField(
