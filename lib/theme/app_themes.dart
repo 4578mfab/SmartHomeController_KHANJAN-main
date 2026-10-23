@@ -24,54 +24,36 @@ class AppThemeData {
 
 class AppThemes {
   static const List<AppThemeData> themes = [
-    // 0 - Fresh Mint
-    AppThemeData(
-      name: 'Fresh Mint',
-      subtitle: 'خنک • آرام • متعادل',
-      primary: Color(0xFF4CAF7A),
-      secondary: Color(0xFFF4D35E),
-      background: Color(0xFFF8FBF6),
-      card: Color(0xFFFFFFFF),
-      text: Color(0xFF2D3436),
-      accent: Color(0xFFE8F5E9),
-    ),
-    // 1 - Soft Sky
-    AppThemeData(
-      name: 'Soft Sky',
-      subtitle: 'هوا • سبک • تازه',
-      primary: Color(0xFF4A90D9),
-      secondary: Color(0xFFFF8A65),
-      background: Color(0xFFF5F9FC),
-      card: Color(0xFFFFFFFF),
-      text: Color(0xFF2C3E50),
-      accent: Color(0xFFE3F2FD),
-    ),
-    // 2 - Warm Peach
-    AppThemeData(
-      name: 'Warm Peach',
-      subtitle: 'گرم • نرم • دوستانه',
-      primary: Color(0xFF7B1FA2),
-      secondary: Color(0xFFC2185B),
-      background: Color(0xFFFFF8F5),
-      card: Color(0xFFFFFFFF),
-      text: Color(0xFF4E342E),
-      accent: Color(0xFFFFF3E0),
-    ),
+    // Calm green
+    AppThemeData(name: 'Mint', subtitle: 'سبز آرام', primary: Color(0xFF168B70), secondary: Color(0xFFFFB547), background: Color(0xFFF2F7F5), card: Color(0xFFFFFFFF), text: Color(0xFF18332E), accent: Color(0xFFE2F2EC)),
+    // Clear blue
+    AppThemeData(name: 'Ocean', subtitle: 'آبی اقیانوسی', primary: Color(0xFF2676D2), secondary: Color(0xFFFF8A65), background: Color(0xFFF1F6FC), card: Color(0xFFFFFFFF), text: Color(0xFF1B2D42), accent: Color(0xFFE1EDFA)),
+    // Violet
+    AppThemeData(name: 'Violet', subtitle: 'بنفش مدرن', primary: Color(0xFF7654C8), secondary: Color(0xFFED6A9B), background: Color(0xFFF6F3FC), card: Color(0xFFFFFFFF), text: Color(0xFF302545), accent: Color(0xFFEDE6FA)),
+    // Warm amber
+    AppThemeData(name: 'Amber', subtitle: 'کهربایی گرم', primary: Color(0xFFB96B16), secondary: Color(0xFF168B70), background: Color(0xFFFFF8EE), card: Color(0xFFFFFFFF), text: Color(0xFF3D2B1A), accent: Color(0xFFFFEED5)),
+    // Graphite dark
+    AppThemeData(name: 'Night', subtitle: 'تیره و آرام', primary: Color(0xFF55D6BE), secondary: Color(0xFFFFC857), background: Color(0xFF101923), card: Color(0xFF1B2835), text: Color(0xFFEAF2F8), accent: Color(0xFF263746)),
+    // Rose
+    AppThemeData(name: 'Rose', subtitle: 'رز ملایم', primary: Color(0xFFC34D79), secondary: Color(0xFF3878B8), background: Color(0xFFFFF4F7), card: Color(0xFFFFFFFF), text: Color(0xFF402531), accent: Color(0xFFFBE3EC)),
+    // Teal
+    AppThemeData(name: 'Teal', subtitle: 'فیروزه‌ای', primary: Color(0xFF087E8B), secondary: Color(0xFFF4A261), background: Color(0xFFF0F8F8), card: Color(0xFFFFFFFF), text: Color(0xFF17363A), accent: Color(0xFFDDF1F1)),
+    // Slate
+    AppThemeData(name: 'Slate', subtitle: 'خاکستری آبی', primary: Color(0xFF526A82), secondary: Color(0xFFE0A458), background: Color(0xFFF2F5F8), card: Color(0xFFFFFFFF), text: Color(0xFF253545), accent: Color(0xFFE4EBF1)),
   ];
 
   static ThemeData buildTheme(AppThemeData t) {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.light,
+      brightness: t.background.computeLuminance() < 0.15 ? Brightness.dark : Brightness.light,
       primaryColor: t.primary,
       scaffoldBackgroundColor: t.background,
-      colorScheme: ColorScheme.light(
-        primary: t.primary,
-        secondary: t.secondary,
-        surface: t.card,
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
-        onSurface: t.text,
+      colorScheme: ColorScheme(
+        brightness: t.background.computeLuminance() < 0.15 ? Brightness.dark : Brightness.light,
+        primary: t.primary, onPrimary: t.background.computeLuminance() < 0.15 ? const Color(0xFF10231F) : Colors.white,
+        secondary: t.secondary, onSecondary: Colors.white,
+        error: Colors.redAccent, onError: Colors.white,
+        surface: t.card, onSurface: t.text,
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: t.card,
