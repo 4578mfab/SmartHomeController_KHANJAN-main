@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class AppThemeData {
   final String name;
-  final String subtitle;
   final Color primary;
   final Color secondary;
   final Color background;
@@ -12,7 +11,6 @@ class AppThemeData {
 
   const AppThemeData({
     required this.name,
-    required this.subtitle,
     required this.primary,
     required this.secondary,
     required this.background,
@@ -24,36 +22,118 @@ class AppThemeData {
 
 class AppThemes {
   static const List<AppThemeData> themes = [
-    // Calm green
-    AppThemeData(name: 'Mint', subtitle: 'سبز آرام', primary: Color(0xFF168B70), secondary: Color(0xFFFFB547), background: Color(0xFFF2F7F5), card: Color(0xFFFFFFFF), text: Color(0xFF18332E), accent: Color(0xFFE2F2EC)),
-    // Clear blue
-    AppThemeData(name: 'Ocean', subtitle: 'آبی اقیانوسی', primary: Color(0xFF2676D2), secondary: Color(0xFFFF8A65), background: Color(0xFFF1F6FC), card: Color(0xFFFFFFFF), text: Color(0xFF1B2D42), accent: Color(0xFFE1EDFA)),
-    // Violet
-    AppThemeData(name: 'Violet', subtitle: 'بنفش مدرن', primary: Color(0xFF7654C8), secondary: Color(0xFFED6A9B), background: Color(0xFFF6F3FC), card: Color(0xFFFFFFFF), text: Color(0xFF302545), accent: Color(0xFFEDE6FA)),
-    // Warm amber
-    AppThemeData(name: 'Amber', subtitle: 'کهربایی گرم', primary: Color(0xFFB96B16), secondary: Color(0xFF168B70), background: Color(0xFFFFF8EE), card: Color(0xFFFFFFFF), text: Color(0xFF3D2B1A), accent: Color(0xFFFFEED5)),
-    // Graphite dark
-    AppThemeData(name: 'Night', subtitle: 'تیره و آرام', primary: Color(0xFF55D6BE), secondary: Color(0xFFFFC857), background: Color(0xFF101923), card: Color(0xFF1B2835), text: Color(0xFFEAF2F8), accent: Color(0xFF263746)),
-    // Rose
-    AppThemeData(name: 'Rose', subtitle: 'رز ملایم', primary: Color(0xFFC34D79), secondary: Color(0xFF3878B8), background: Color(0xFFFFF4F7), card: Color(0xFFFFFFFF), text: Color(0xFF402531), accent: Color(0xFFFBE3EC)),
-    // Teal
-    AppThemeData(name: 'Teal', subtitle: 'فیروزه‌ای', primary: Color(0xFF087E8B), secondary: Color(0xFFF4A261), background: Color(0xFFF0F8F8), card: Color(0xFFFFFFFF), text: Color(0xFF17363A), accent: Color(0xFFDDF1F1)),
-    // Slate
-    AppThemeData(name: 'Slate', subtitle: 'خاکستری آبی', primary: Color(0xFF526A82), secondary: Color(0xFFE0A458), background: Color(0xFFF2F5F8), card: Color(0xFFFFFFFF), text: Color(0xFF253545), accent: Color(0xFFE4EBF1)),
+    AppThemeData(
+      name: 'mint',
+      primary: Color(0xFF43A047),
+      secondary: Color(0xFF81C784),
+      background: Color(0xFFF3FBF4),
+      card: Color(0xFFFFFFFF),
+      text: Color(0xFF1B5E20),
+      accent: Color(0xFFE8F5E9),
+    ),
+    AppThemeData(
+      name: 'sky',
+      primary: Color(0xFF1E88E5),
+      secondary: Color(0xFF64B5F6),
+      background: Color(0xFFF3F8FD),
+      card: Color(0xFFFFFFFF),
+      text: Color(0xFF0D47A1),
+      accent: Color(0xFFE3F2FD),
+    ),
+    AppThemeData(
+      name: 'coral',
+      primary: Color(0xFFFF7043),
+      secondary: Color(0xFFFFAB91),
+      background: Color(0xFFFFF6F3),
+      card: Color(0xFFFFFFFF),
+      text: Color(0xFFBF360C),
+      accent: Color(0xFFFBE9E7),
+    ),
+    AppThemeData(
+      name: 'purple',
+      primary: Color(0xFF8E24AA),
+      secondary: Color(0xFFBA68C8),
+      background: Color(0xFFFBF5FC),
+      card: Color(0xFFFFFFFF),
+      text: Color(0xFF4A148C),
+      accent: Color(0xFFF3E5F5),
+    ),
+    AppThemeData(
+      name: 'teal',
+      primary: Color(0xFF00897B),
+      secondary: Color(0xFF4DB6AC),
+      background: Color(0xFFF1FAF9),
+      card: Color(0xFFFFFFFF),
+      text: Color(0xFF004D40),
+      accent: Color(0xFFE0F2F1),
+    ),
+    AppThemeData(
+      name: 'amber',
+      primary: Color(0xFFFFA000),
+      secondary: Color(0xFFFFD54F),
+      background: Color(0xFFFFFBF0),
+      card: Color(0xFFFFFFFF),
+      text: Color(0xFFE65100),
+      accent: Color(0xFFFFF8E1),
+    ),
+    AppThemeData(
+      name: 'rose',
+      primary: Color(0xFFE91E63),
+      secondary: Color(0xFFF48FB1),
+      background: Color(0xFFFFF5F8),
+      card: Color(0xFFFFFFFF),
+      text: Color(0xFF880E4F),
+      accent: Color(0xFFFCE4EC),
+    ),
+    AppThemeData(
+      name: 'indigo',
+      primary: Color(0xFF3949AB),
+      secondary: Color(0xFF7986CB),
+      background: Color(0xFFF5F6FC),
+      card: Color(0xFFFFFFFF),
+      text: Color(0xFF1A237E),
+      accent: Color(0xFFE8EAF6),
+    ),
+    AppThemeData(
+      name: 'lime',
+      primary: Color(0xFF7CB342),
+      secondary: Color(0xFFAED581),
+      background: Color(0xFFF7FBF1),
+      card: Color(0xFFFFFFFF),
+      text: Color(0xFF33691E),
+      accent: Color(0xFFF1F8E9),
+    ),
+    AppThemeData(
+      name: 'cyan',
+      primary: Color(0xFF00ACC1),
+      secondary: Color(0xFF4DD0E1),
+      background: Color(0xFFF0FBFC),
+      card: Color(0xFFFFFFFF),
+      text: Color(0xFF006064),
+      accent: Color(0xFFE0F7FA),
+    ),
   ];
+
+  static int clampIndex(int index) {
+    if (themes.isEmpty) return 0;
+    return index.clamp(0, themes.length - 1);
+  }
+
+  static AppThemeData of(int index) => themes[clampIndex(index)];
 
   static ThemeData buildTheme(AppThemeData t) {
     return ThemeData(
       useMaterial3: true,
-      brightness: t.background.computeLuminance() < 0.15 ? Brightness.dark : Brightness.light,
+      brightness: Brightness.light,
       primaryColor: t.primary,
       scaffoldBackgroundColor: t.background,
-      colorScheme: ColorScheme(
-        brightness: t.background.computeLuminance() < 0.15 ? Brightness.dark : Brightness.light,
-        primary: t.primary, onPrimary: t.background.computeLuminance() < 0.15 ? const Color(0xFF10231F) : Colors.white,
-        secondary: t.secondary, onSecondary: Colors.white,
-        error: Colors.redAccent, onError: Colors.white,
-        surface: t.card, onSurface: t.text,
+      colorScheme: ColorScheme.light(
+        primary: t.primary,
+        secondary: t.secondary,
+        surface: t.card,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        onSurface: t.text,
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: t.card,
@@ -88,7 +168,8 @@ class AppThemes {
         style: ElevatedButton.styleFrom(
           backgroundColor: t.primary,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         ),
       ),
@@ -99,7 +180,8 @@ class AppThemes {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }
