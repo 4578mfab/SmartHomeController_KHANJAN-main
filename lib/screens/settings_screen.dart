@@ -154,7 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppThemes.themes[_settings.themeIndex.clamp(0, AppThemes.themes.length - 1)];
+    final theme = AppThemes.of(_settings.themeIndex);
     final materialTheme = AppThemes.buildTheme(theme);
 
     return Theme(
@@ -181,32 +181,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              _sectionTitle('رنگ‌بندی برنامه', theme),
+              _sectionTitle('رنگ برنامه', theme),
               _card(theme, [
-                Text('برای تغییر رنگ پس‌زمینه و دکمه‌ها یکی از رنگ‌ها را انتخاب کن.', style: TextStyle(color: theme.text.withOpacity(0.72), fontSize: 13)),
-                const SizedBox(height: 14),
                 Wrap(
-                  spacing: 14,
+                  spacing: 12,
                   runSpacing: 12,
                   children: List.generate(AppThemes.themes.length, (i) {
-                    final option = AppThemes.themes[i];
+                    final t = AppThemes.themes[i];
                     final selected = i == _settings.themeIndex;
-                    return InkWell(
-                      onTap: () => setState(() => _settings.themeIndex = i),
-                      customBorder: const CircleBorder(),
-                      child: Tooltip(
-                        message: option.subtitle,
-                        child: Container(
-                          width: 38,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: option.primary,
-                            border: Border.all(color: selected ? theme.text : theme.card, width: selected ? 3 : 1),
-                            boxShadow: [BoxShadow(color: option.primary.withOpacity(0.22), blurRadius: 5, offset: const Offset(0, 2))],
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() => _settings.themeIndex = i);
+                      },
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: t.primary,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: selected
+                                ? theme.text
+                                : Colors.black.withOpacity(0.08),
+                            width: selected ? 3 : 1,
                           ),
-                          child: selected ? const Icon(Icons.check, color: Colors.white, size: 19) : null,
+                          boxShadow: selected
+                              ? [
+                                  BoxShadow(
+                                    color: t.primary.withOpacity(0.45),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ]
+                              : null,
                         ),
+                        child: selected
+                            ? const Icon(
+                                Icons.check,
+                                size: 18,
+                                color: Colors.white,
+                              )
+                            : null,
                       ),
                     );
                   }),
