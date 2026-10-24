@@ -124,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppThemes.themes[_settings.themeIndex.clamp(0, AppThemes.themes.length - 1)];
+    final theme = AppThemes.of(_settings.themeIndex);
     final materialTheme = AppThemes.buildTheme(theme);
 
     if (_loading) {
@@ -139,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         backgroundColor: theme.background,
         appBar: AppBar(
-          title: const Text('KHANJAN'),
+          title: const Text('KHANJAN IoT Home'),
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 2),
@@ -280,7 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onChanged: (v) => _onToggle(r, v),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
             ],
           ),
         ),
